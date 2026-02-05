@@ -7,11 +7,11 @@ MULTI-REFRESH-RATE SUPPORT - AUTOMATIC VALIDATION
 
 SUPPORTED REFRESH RATES:
 ------------------------
-✓ 480 Hz (High-end gaming monitors)
-✓ 360 Hz (Gaming monitors)
-✓ 240 Hz (Gaming monitors)
-✓ 120 Hz (Standard high refresh rate)
-✓ 60 Hz (Standard monitors)
+✓ 480 Hz 
+✓ 360 Hz 
+✓ 240 Hz 
+✓ 120 Hz 
+✓ 60 Hz 
 
 AUTOMATIC VALIDATION:
 ---------------------
@@ -48,7 +48,7 @@ WINDOW_WIDTH = 1200  # 1920
 WINDOW_HEIGHT = 900  # 1080
 
 # Background color - Mid-gray for chromatic fusion
-BACKGROUND_COLOR = [0.12, 0.12, 0.12]  # Mid-gray
+BACKGROUND_COLOR = [0.0, 0.0, 0.0]  # Mid-gray
 
 # *** MONITOR REFRESH RATE - MUST MATCH YOUR ACTUAL MONITOR ***
 REFRESH_RATE = 60  # Hz - Options: 480, 360, 240, 120, 60
@@ -61,7 +61,7 @@ NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz
 ENABLE_NINE_OCLOCK_FLICKER = False  # Set to False to disable flicker
 
 # Flicker settings for 3 o'clock Gabor
-THREE_OCLOCK_FLICKER_FREQUENCY = 15  # Hz
+THREE_OCLOCK_FLICKER_FREQUENCY = 30  # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True  # Set to False to disable flicker
 
 # ==================== VALIDATION FUNCTIONS ====================
