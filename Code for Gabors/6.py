@@ -24,7 +24,7 @@ WINDOW_HEIGHT = 900 # 1080
 # Background color - Mid-gray for chromatic fusion
 BACKGROUND_COLOR = [0.12, 0.12, 0.12]  # Mid-gray (same as t5.py)
 
-REFRESH_RATE = 60  # Hz - CRITICAL: Must match your monitor's actual refresh rate
+REFRESH_RATE = 480  # Hz - CRITICAL: Must match your monitor's actual refresh rate
 # NOTE: IN MACBOOK M3 120 Hz WORKS GOOD
 
 # ================== FLICKER CONFIGURATION ========================
@@ -34,7 +34,7 @@ NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz
 ENABLE_NINE_OCLOCK_FLICKER = True   # Set to False to disable flicker
 
 # Flicker settings for 3 o'clock Gabor
-THREE_OCLOCK_FLICKER_FREQUENCY = 30  # Hz - GOLD STANDARD for fusion
+THREE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz - GOLD STANDARD for fusion
 ENABLE_THREE_OCLOCK_FLICKER = True  # Set to False to disable flicker
 
 # ================== GABOR PARAMETERS ========================
