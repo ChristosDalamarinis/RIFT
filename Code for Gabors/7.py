@@ -12,7 +12,19 @@ Features:
 """
 
 # NOTE: THIS SCRIPT IS AN TERATION OF 6.PY - THE GOAL IN TO IMPROVE BUFFER EFFICIENCY AT 480Hz AND TAKE INTO ACCOUNT THE SINCE ARCHITECTURE OF FRAMES AND REFRASH RATE. 
-#       
+
+from psychopy import visual, core, event
+import numpy as np
+
+# ========================= CONFIGURATION ========================
+
+WINDOW_WIDTH = 1200 # 1920
+WINDOW_HEIGHT = 900 # 1080
+
+# Background color - Mid-gray for chromatic fusion
+BACKGROUND_COLOR = [0.12, 0.12, 0.12]  # Mid-gray (same as t5.py)
+
+REFRESH_RATE = 60  # Hz - CRITICAL: Must match your monitor's actual refresh rate
 
 
 
