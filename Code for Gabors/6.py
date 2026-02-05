@@ -11,7 +11,7 @@ Features:
 - Optimized for 60Hz flicker on 120Hz monitor
 """
 
-# NOTE: COMPARED TO 5.PY THIS SCRIPT ADD ONLY SATURATION CONTROL OF COLURS
+# NOTE: COMPARED TO 5.PY THIS SCRIPT ADDS ONLY SATURATION CONTROL OF COLORS
 
 from psychopy import visual, core, event
 import numpy as np
