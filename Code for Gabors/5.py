@@ -10,6 +10,8 @@ Features:
 - Optimized for 60Hz flicker on 120Hz monitor
 """
 
+# NOTE: THE ONLY ADDITION COMPARED TO 4.PY IS THE LUMINANCE CONTROL
+
 from psychopy import visual, core, event
 import numpy as np
 
@@ -368,9 +370,3 @@ print("="*70 + "\n")
 
 win.close()
 core.quit()
-
-
-
-
-
-# the only addtion compared to 4.py is the luminance control
