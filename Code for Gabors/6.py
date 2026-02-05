@@ -411,8 +411,3 @@ print("="*70 + "\n")
 
 win.close()
 core.quit()
-
-
-
-
-
