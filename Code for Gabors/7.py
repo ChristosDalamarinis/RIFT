@@ -42,6 +42,7 @@ COMMON VALID FLICKER FREQUENCIES:
 # NOTE: i need to add all the functionalities of 6.py to 7.py - IMPORTANT
 # NOTE: also i need to look again in the refresh rate and flicker frequency math/theroy and understand it well
 # NOTE: from 6.py i need to add "GABOR PARAMETERS", "SMOOTHNESS CONTROL", "ORIENTATION/TILT CONTROL", "LUMINANCE CONTROL", "SATURATION CONTROL", "COLOR PROCESSING" and all the code related to these parameters
+# NOTE: incorporate RGB colours also
 
 from psychopy import visual, core, event
 import numpy as np
