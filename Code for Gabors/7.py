@@ -55,7 +55,7 @@ WINDOW_HEIGHT = 900  # 1080
 BACKGROUND_COLOR = [0.0, 0.0, 0.0]  # Mid-gray
 
 # *** MONITOR REFRESH RATE - MUST MATCH YOUR ACTUAL MONITOR ***
-REFRESH_RATE = 60  # Hz - Options: 480, 360, 240, 120, 60
+REFRESH_RATE = 480  # Hz - Options: 480, 360, 240, 120, 60
 # CRITICAL: Set this to your actual monitor refresh rate!
 # To check your monitor: Windows Settings → Display → Advanced Display → Refresh Rate
 
@@ -65,7 +65,7 @@ NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz
 ENABLE_NINE_OCLOCK_FLICKER = False  # Set to False to disable flicker
 
 # Flicker settings for 3 o'clock Gabor
-THREE_OCLOCK_FLICKER_FREQUENCY = 30  # Hz
+THREE_OCLOCK_FLICKER_FREQUENCY = 64  # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True  # Set to False to disable flicker
 
 # ==================== VALIDATION FUNCTIONS ====================
