@@ -2,7 +2,7 @@
 8 Gabor Patches Visual Task - Frame-Based Precise Flicker (7.py)
 
 ================================================================================
-MULTI-REFRESH-RATE SUPPORT - AUTOMATIC VALIDATION
+            MULTI-REFRESH-RATE SUPPORT - AUTOMATIC VALIDATION
 ================================================================================
 
 SUPPORTED REFRESH RATES:
@@ -31,7 +31,7 @@ VALID COMBINATIONS:
 
 COMMON VALID FLICKER FREQUENCIES:
 ----------------------------------
-- 60 Hz: Works on 120Hz, 240Hz, 360Hz, 480Hz (NOT 60Hz)
+- 60 Hz: Works on 120Hz, 240Hz, 360Hz, 480Hz 
 - 30 Hz: Works on ALL refresh rates
 - 20 Hz: Works on 60Hz, 120Hz, 240Hz, 360Hz, 480Hz
 - 15 Hz: Works on 60Hz, 120Hz, 240Hz, 360Hz, 480Hz
@@ -39,6 +39,9 @@ COMMON VALID FLICKER FREQUENCIES:
 
 ================================================================================
 """
+# NOTE: i need to add all the functionalities of 6.py to 7.py - IMPORTANT
+# NOTE: also i need to look again in the refresh rate and flicker frequency math/theroy and understand it well
+# NOTE: from 6.py i need to add "GABOR PARAMETERS", "SMOOTHNESS CONTROL", "ORIENTATION/TILT CONTROL", "LUMINANCE CONTROL", "SATURATION CONTROL", "COLOR PROCESSING" and all the code related to these parameters
 
 from psychopy import visual, core, event
 import numpy as np
