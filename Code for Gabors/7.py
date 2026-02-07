@@ -63,7 +63,7 @@ REFRESH_RATE = 480  # Hz - Options: 480, 360, 240, 120, 60
 # ================== FLICKER CONFIGURATION ========================
 # Flicker settings for 9 o'clock Gabor
 NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz 
-ENABLE_NINE_OCLOCK_FLICKER = False  # Set to False to disable flicker
+ENABLE_NINE_OCLOCK_FLICKER = True  # Set to False to disable flicker
 
 # Flicker settings for 3 o'clock Gabor
 THREE_OCLOCK_FLICKER_FREQUENCY = 64  # Hz
