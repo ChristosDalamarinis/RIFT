@@ -1,6 +1,14 @@
-""" Compared to 9.py this script attempts toautoamtically determine the refresh rate.
+""" 
+Compared to 9.py this script attempts to automatically determine the refresh rate.
     If it cannot be determined, it defaults to a prespecified refresh rate, definedby the user in line 24. 
     The rest of the code is the same as 9.py
+
+
+THIS SCRIPT WONT INDUCE ANY EEG RESPONSES AS IT FLICKERS BETWEEN OPACITY LEVELS
+BUT NO LUMINANCE CHANGE IS OCCURRING, THEREFORE NO RETINAL MODULATION HAPPENS
+
+SAME PROBLEMS AS 9.PY APPLY HERE
+
 """
 
 from psychopy import visual, core, event
