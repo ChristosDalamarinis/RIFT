@@ -39,10 +39,8 @@ COMMON VALID FLICKER FREQUENCIES:
 
 ================================================================================
 """
-# NOTE: i need to add all the functionalities of 6.py to 7.py - IMPORTANT
-# NOTE: also i need to look again in the refresh rate and flicker frequency math/theroy and understand it well
-# NOTE: from 6.py i need to add "GABOR PARAMETERS", "SMOOTHNESS CONTROL", "ORIENTATION/TILT CONTROL", "LUMINANCE CONTROL", "SATURATION CONTROL", "COLOR PROCESSING" and all the code related to these parameters
-# NOTE: incorporate RGB colours also
+# NOTE: the functionalities of 6.py are in line 228 onwards 
+# NOTE: incorporate RGB colours 
 # NOTE: focus on this script
 
 from psychopy import visual, core, event
@@ -56,17 +54,17 @@ WINDOW_HEIGHT = 900  # 1080
 BACKGROUND_COLOR = [0.0, 0.0, 0.0]  # Mid-gray
 
 # *** MONITOR REFRESH RATE - MUST MATCH YOUR ACTUAL MONITOR ***
-REFRESH_RATE = 480  # Hz - Options: 480, 360, 240, 120, 60
+REFRESH_RATE = 60  # Hz - Options: 480, 360, 240, 120, 60
 # CRITICAL: Set this to your actual monitor refresh rate!
 # To check your monitor: Windows Settings → Display → Advanced Display → Refresh Rate
 
 # ================== FLICKER CONFIGURATION ========================
 # Flicker settings for 9 o'clock Gabor
 NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz 
-ENABLE_NINE_OCLOCK_FLICKER = True  # Set to False to disable flicker
+ENABLE_NINE_OCLOCK_FLICKER = False  # Set to False to disable flicker
 
 # Flicker settings for 3 o'clock Gabor
-THREE_OCLOCK_FLICKER_FREQUENCY = 64  # Hz
+THREE_OCLOCK_FLICKER_FREQUENCY = 30  # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True  # Set to False to disable flicker
 
 # ==================== VALIDATION FUNCTIONS ====================
