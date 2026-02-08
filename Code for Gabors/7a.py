@@ -15,6 +15,7 @@ ADAPTIVE ALGORITHM:
 
 # NOTE: this script uses sqaure-wave architecture for flickering between two colours.
 
+
 from psychopy import visual, core, event
 import numpy as np
 from fractions import Fraction
@@ -214,8 +215,23 @@ ORIENTATION_3_OCLOCK = -20
 
 # ================== COLOR CONFIGURATION ========================
 GRAY_COLOR = [0.5, 0.5, 0.5] # For static Gabors (non-flickering)
+
+# Flickering between two opposite colors in RGB space (GREEN vs MAGENTA) by default
 COLOR_A = [-1.0, 1.0, -1.0]  # GREEN
 COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
+
+# Uncomment below to choose flicker betwee white and black and other opposite colours
+# COLOR_A = [1.0, 1.0, 1.0]      # WHITE
+# COLOR_B = [-1.0, -1.0, -1.0]   # BLACK
+
+# Uncomment below to choose flicker between red and cyan (opposite on RGB) 
+# COLOR_A = [1.0, -1.0, -1.0]   # RED
+# COLOR_B = [-1.0, 1.0, 1.0]    # CYAN
+
+# Uncomment below to choose flicker between blue and yellow (opposite on RGB)
+# COLOR_A = [-1.0, -1.0, 1.0]   # BLUE
+# COLOR_B = [1.0, 1.0, -1.0]    # YELLOW
+
 
 ENABLE_LUMINANCE_SCALING = True
 LUMINANCE_MULTIPLIER = 1.0
