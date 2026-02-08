@@ -40,7 +40,7 @@ COMMON VALID FLICKER FREQUENCIES:
 ================================================================================
 """
 # NOTE: the functionalities of 6.py are in line 228 onwards 
-# NOTE: incorporate RGB colours 
+# NOTE: incorporatig RGB colours is a bad idea in psychopy as it requires a convertion
 # NOTE: focus on this script
 
 from psychopy import visual, core, event

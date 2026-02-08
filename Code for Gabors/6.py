@@ -12,6 +12,7 @@ Features:
 """
 
 # NOTE: COMPARED TO 5.PY THIS SCRIPT ADDS ONLY SATURATION CONTROL OF COLORS
+# NOTE: 6/02/2026 - maybe see how i can incorporate the sine wave approach during the discussion with Yayla
 
 from psychopy import visual, core, event
 import numpy as np
