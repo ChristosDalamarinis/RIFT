@@ -30,7 +30,7 @@ REFRESH_RATE = 60  # Hz - Supports: 60, 120, 240, 360, 480
 NINE_OCLOCK_FLICKER_FREQUENCY = 64  # Hz - Now supports non-integer!
 ENABLE_NINE_OCLOCK_FLICKER = False
 
-THREE_OCLOCK_FLICKER_FREQUENCY = 12  # Hz
+THREE_OCLOCK_FLICKER_FREQUENCY = 30 # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True
 
 # ==================== ADAPTIVE FLICKER CLASS ====================
@@ -217,12 +217,12 @@ ORIENTATION_3_OCLOCK = -20
 GRAY_COLOR = [0.5, 0.5, 0.5] # For static Gabors (non-flickering)
 
 # Flickering between two opposite colors in RGB space (GREEN vs MAGENTA) by default
-COLOR_A = [-1.0, 1.0, -1.0]  # GREEN
-COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
+# COLOR_A = [-1.0, 1.0, -1.0]  # GREEN
+# COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
 
 # Uncomment below to choose flicker betwee white and black and other opposite colours
-# COLOR_A = [1.0, 1.0, 1.0]      # WHITE
-# COLOR_B = [-1.0, -1.0, -1.0]   # BLACK
+COLOR_A = [1.0, 1.0, 1.0]      # WHITE
+COLOR_B = [-1.0, -1.0, -1.0]   # BLACK
 
 # Uncomment below to choose flicker between red and cyan (opposite on RGB) 
 # COLOR_A = [1.0, -1.0, -1.0]   # RED
@@ -316,7 +316,7 @@ for hour in clock_positions:
 
     gabors[hour] = visual.GratingStim(
         win,
-        tex='sqr', # Sinusoidal grating = "sin", OR Square for sharper edges. Other options: 'sin', 'sqr', 'cross', 'saw', 'none'
+        tex='sin', # Sinusoidal grating = "sin", OR "sqr" for sharper edges. Other options: 'sin', 'sqr', 'cross', 'saw', 'none'
         mask=custom_mask,
         size=GABOR_SIZE,
         pos=pos,
