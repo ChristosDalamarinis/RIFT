@@ -1,9 +1,9 @@
 from psychopy import visual
 
-win = visual.Window([1200, 900], fullscr=False)
+win = visual.Window([1200, 900], fullscr=True)
 
 # Try to measure
-measured_rate = win.getActualFrameRate(nIdentical=60, nMaxFrames=120)
+measured_rate = win.getActualFrameRate(nIdentical=60, nMaxFrames=240)
 
 if measured_rate is None:
     print("❌ Auto-detection FAILED - using fallback")
