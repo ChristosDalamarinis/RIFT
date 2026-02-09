@@ -25,21 +25,21 @@ import numpy as np
 from fractions import Fraction
 
 # ========================= CONFIGURATION ========================
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 900
-BACKGROUND_COLOR = [0.12, 0.12, 0.12]
-REFRESH_RATE = 60  # Hz
+WINDOW_WIDTH = 1920
+WINDOW_HEIGHT = 1080
+BACKGROUND_COLOR = [0.0, 0.0, 0.0]
+REFRESH_RATE = 240  # Hz
 
 # ================== FLICKER CONFIGURATION ========================
 NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz
-ENABLE_NINE_OCLOCK_FLICKER = False
+ENABLE_NINE_OCLOCK_FLICKER = True
 
-THREE_OCLOCK_FLICKER_FREQUENCY = 30  # Hz
+THREE_OCLOCK_FLICKER_FREQUENCY = 1  # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True
 
 # ================== FLICKER MODE CONFIGURATION ========================
 # Choose flicker mode: 'SQUARE' or 'SINE'
-FLICKER_MODE = 'SINE'  # Options: 'SQUARE', 'SINE'
+FLICKER_MODE = 'SQUARE'  # Options: 'SQUARE', 'SINE'                       NOTE: use square if 120hz monitor and 60hz flicker is used
 
 print(f"\n{'='*70}")
 print(f"FLICKER MODE: {FLICKER_MODE}-WAVE")
@@ -244,16 +244,16 @@ else:
 print(f"{'='*70}\n")
 
 # ================== GABOR PARAMETERS ========================
-GABOR_SIZE = 2000
+GABOR_SIZE = 1500
 CIRCLE_RADIUS = 300
-GABOR_SF = 0.05
+GABOR_SF = 0.05 # 0.05 by default
 GABOR_CONTRAST = 1.0
 GABOR_OPACITY = 1.0
 GABOR_PHASE = 0.5
 
-GABOR_SMOOTHNESS_DEFAULT = 0.05
-GABOR_SMOOTHNESS_9_OCLOCK = 0.05
-GABOR_SMOOTHNESS_3_OCLOCK = 0.05
+GABOR_SMOOTHNESS_DEFAULT = 0.05  # 0.05 be default
+GABOR_SMOOTHNESS_9_OCLOCK = 0.05 # 0.05 by default
+GABOR_SMOOTHNESS_3_OCLOCK = 0.05 # 0.05 by default
 
 ORIENTATION_DEFAULT = 0
 ORIENTATION_9_OCLOCK = -20
@@ -266,13 +266,13 @@ ORIENTATION_3_OCLOCK = -20
 GRAY_COLOR = [0.5, 0.5, 0.5] # Mid-gray for static Gabors (non-flickering)
 
 # Flickering between GREEN vs MAGENTA by default
-COLOR_A = [-1.0, 1.0, -1.0]  # GREEN
-COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
+#COLOR_A = [-1.0, 1.0, -1.0]  # GREEN
+#COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
 
 # Option 2: Luminance modulation (BLACK/WHITE) - UNCOMMENT TO USE
 # GRAY_COLOR = [0.0, 0.0, 0.0]
-# COLOR_A = [-1.0, -1.0, -1.0]  # BLACK
-# COLOR_B = [1.0, 1.0, 1.0]     # WHITE
+COLOR_A = [-1.0, -1.0, -1.0]  # BLACK
+COLOR_B = [1.0, 1.0, 1.0]     # WHITE
 
 # Option 3: Red/Cyan opponent colors - UNCOMMENT TO USE
 # GRAY_COLOR = [0.5, 0.5, 0.5]
@@ -285,10 +285,10 @@ COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
 # COLOR_B = [1.0, 1.0, -1.0]    # YELLOW
 
 ENABLE_LUMINANCE_SCALING = True
-LUMINANCE_MULTIPLIER = 1.0
+LUMINANCE_MULTIPLIER = 0.7
 
 ENABLE_SATURATION_CONTROL = True
-SATURATION_LEVEL = 1.0
+SATURATION_LEVEL = 0.7
 
 TRIAL_DURATION = None
 
@@ -364,7 +364,7 @@ fixation = visual.ShapeStim(
 
 # ==================== CREATE GABOR STIMULI ====================
 gabors = {}
-clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]
+clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]    # NOTE: by default -> clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]
 
 for hour in clock_positions:
     pos = get_clock_position(hour, CIRCLE_RADIUS)
@@ -379,11 +379,11 @@ for hour in clock_positions:
         smoothness = GABOR_SMOOTHNESS_DEFAULT
         orientation = ORIENTATION_DEFAULT
 
-    custom_mask = create_custom_mask(size=256, sigma=smoothness)
+    custom_mask = create_custom_mask(size=256, sigma=smoothness)     # NOTE: 256 by default
 
     gabors[hour] = visual.GratingStim(
         win,
-        tex='sqr',
+        tex='sqr', # Sinusoidal grating = "sin", OR "sqr" for sharper edges. Other options: 'sin', 'sqr', 'cross', 'saw', 'none' NOTE: "sin" is not very good 
         mask=custom_mask,
         size=GABOR_SIZE,
         pos=pos,
