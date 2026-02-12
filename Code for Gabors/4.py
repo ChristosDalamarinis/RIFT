@@ -20,7 +20,7 @@ WINDOW_HEIGHT = 900
 # Background color - Mid-gray for chromatic fusion
 BACKGROUND_COLOR = [0.0, 0.0, 0.0]  # Mid-gray (same as t5.py)
 
-REFRESH_RATE = 120  # Hz - CRITICAL: Must match your monitor's actual refresh rate
+REFRESH_RATE = 480  # Hz - CRITICAL: Must match your monitor's actual refresh rate
 # NOTE: IN MACBOOK M3 120 Hz WORKS GOOD
 
 # ================== FLICKER CONFIGURATION ========================
@@ -30,7 +30,7 @@ NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz
 ENABLE_NINE_OCLOCK_FLICKER = False  # Set to False to disable flicker
 
 # Flicker settings for 3 o'clock Gabor
-THREE_OCLOCK_FLICKER_FREQUENCY =  60 # Hz - GOLD STANDARD for fusion
+THREE_OCLOCK_FLICKER_FREQUENCY =  1 # Hz - GOLD STANDARD for fusion
 ENABLE_THREE_OCLOCK_FLICKER = True  # Set to False to disable flicker
 
 # ================== GABOR PARAMETERS ========================
@@ -48,7 +48,7 @@ GABOR_PHASE = 0  # Phase offset - shifts stripe position
 
 GABOR_SMOOTHNESS_DEFAULT = 0.05  # Default for all Gabors except 3 and 9 o'clock
 GABOR_SMOOTHNESS_9_OCLOCK = 0.05  # Smoothness for 9 o'clock Gabor
-GABOR_SMOOTHNESS_3_OCLOCK = 0.05  # Smoothness for 3 o'clock Gabor
+GABOR_SMOOTHNESS_3_OCLOCK = 0.15  # Smoothness for 3 o'clock Gabor
 
 # ================== ORIENTATION/TILT CONTROL ========================
 # Orientation in degrees (0 = horizontal stripes, 90 = vertical stripes)
