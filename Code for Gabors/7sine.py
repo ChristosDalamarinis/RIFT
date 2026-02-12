@@ -19,6 +19,7 @@ Both average to gray, but sine-wave provides smoother transitions.
 """
 
 # NOTE: this script has a sine-wave architecture for the flickering between opposite colours or black and white.
+# NOTE: this is the 1st script employing the algorithm but you can choose between a SINE or SQUARE wave for flickering.
 
 from psychopy import visual, core, event
 import numpy as np
@@ -364,7 +365,7 @@ fixation = visual.ShapeStim(
 
 # ==================== CREATE GABOR STIMULI ====================
 gabors = {}
-clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]    # NOTE: by default -> clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]
+clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]   # NOTE: by default -> clock_positions = [12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]
 
 for hour in clock_positions:
     pos = get_clock_position(hour, CIRCLE_RADIUS)
@@ -379,7 +380,7 @@ for hour in clock_positions:
         smoothness = GABOR_SMOOTHNESS_DEFAULT
         orientation = ORIENTATION_DEFAULT
 
-    custom_mask = create_custom_mask(size=256, sigma=smoothness)     # NOTE: 256 by default
+    custom_mask = create_custom_mask(size=256, sigma=smoothness) # NOTE: 256 by default
 
     gabors[hour] = visual.GratingStim(
         win,
