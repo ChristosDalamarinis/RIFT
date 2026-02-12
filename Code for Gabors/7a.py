@@ -13,8 +13,8 @@ ADAPTIVE ALGORITHM:
 ================================================================================
 """
 
-# NOTE: this script uses sqaure-wave architecture for flickering between two colours.
-
+# NOTE: this script uses sqaure-wave architecture for flickering between two colours. This is the algorithm in line 37
+# NOTE: this is the 1st script employing the algorithm for non-integer freame counts.
 
 from psychopy import visual, core, event
 import numpy as np
