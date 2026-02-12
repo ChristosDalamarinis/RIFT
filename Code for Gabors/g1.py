@@ -15,7 +15,7 @@ import numpy as np
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 900
 BACKGROUND_COLOR = [-0.2, -0.2, -0.2]  # Negative values -> darkness
-REFRESH_RATE = 120  # Hz - set to your monitor's actual refresh rate
+REFRESH_RATE = 360  # Hz - set to your monitor's actual refresh rate
 
 # ================== FLICKER CONFIGURATION ========================
 
