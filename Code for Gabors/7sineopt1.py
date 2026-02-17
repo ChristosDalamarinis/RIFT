@@ -1,0 +1,555 @@
+#! This scipt has an optimized RIFT LOOP
+
+"""
+8 Gabor Patches - ADAPTIVE Frame-Based SINE-WAVE Flicker (7_sine_optimized.py)
+
+NEW IN THIS VERSION:
+- Pre-computed colors for optimal 240Hz+ performance
+- Built-in frame timing diagnostics
+- All original sine-wave and adaptive features preserved
+
+OPTIMIZATIONS:
+- Colors calculated once before trial (not per-frame)
+- Fast array lookup instead of computation
+- Detailed timing diagnostics after trial
+
+================================================================================
+"""
+
+
+# NOTE: this scripts has an optimized Rift Loop compared to "7sineopt.py"
+# NOTE: see the helper thread in perplexity for this new loop
+#! LIMITATION: this scripts runs for 21sec. as only 10.000 frames are pre-computed!!!!!!!!!!
+
+from psychopy import visual, core, event
+import numpy as np
+from fractions import Fraction
+import time
+
+# ========================= CONFIGURATION ========================
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 900
+BACKGROUND_COLOR = [0.1, 0.1, 0.1] # 0.25 is a good option         0.075 another option       0.1 also
+REFRESH_RATE =  480  # Hz - Change to your monitor (60, 120, 240, 360, 480, 500)
+
+# ================== FLICKER CONFIGURATION ========================
+NINE_OCLOCK_FLICKER_FREQUENCY = 60  # Hz   
+ENABLE_NINE_OCLOCK_FLICKER = True
+
+THREE_OCLOCK_FLICKER_FREQUENCY =  64 # Hz     # NOTE: 64 has some artifacts (halo), maybe look at the algorithm to fix it?
+ENABLE_THREE_OCLOCK_FLICKER = False
+
+# ================== FLICKER MODE CONFIGURATION ========================
+FLICKER_MODE = 'SINE'  # Options: 'SQUARE', 'SINE'         NOTE: SINE is a very good option when using 360Hz with 60Hz flicker
+
+print(f"\n{'='*70}")
+print(f"FLICKER MODE: {FLICKER_MODE}-WAVE")
+print(f"{'='*70}")
+if FLICKER_MODE == 'SINE':
+    print("Sine-wave modulation: Smooth gradual color transitions")
+    print("Benefits: Smoother perceptual fusion, reduced edge artifacts")
+else:
+    print("Square-wave modulation: Abrupt color switching (standard RIFT)")
+    print("Benefits: Stronger SSVEP response, standard in literature")
+print(f"{'='*70}\n")
+
+#! ==================== ADAPTIVE FLICKER CLASS WITH SINE ====================
+class AdaptiveFlickerPattern:
+    """
+    Manages adaptive frame patterns with optional sine-wave modulation.
+    Handles both integer and non-integer frame counts perfectly.
+    """
+
+    def __init__(self, refresh_rate, flicker_frequency, mode='SQUARE'):
+        """
+        Args:
+            refresh_rate: Monitor refresh rate in Hz
+            flicker_frequency: Target flicker frequency in Hz
+            mode: 'SQUARE' for abrupt switching, 'SINE' for smooth transitions
+        """
+        self.refresh_rate = refresh_rate
+        self.flicker_frequency = flicker_frequency
+        self.mode = mode.upper()
+
+        # Calculate ideal frames per half-cycle
+        self.ideal_frames_per_half = refresh_rate / flicker_frequency / 2
+
+        # Get floor and ceiling
+        self.frames_low = int(np.floor(self.ideal_frames_per_half))
+        self.frames_high = int(np.ceil(self.ideal_frames_per_half))
+
+        # Check if integer (no adaptation needed)
+        self.is_integer = (self.frames_low == self.frames_high)
+
+        if self.is_integer:
+            self.pattern = [self.frames_low]
+            self.pattern_length = 1
+        else:
+            self.pattern = self._generate_pattern()
+            self.pattern_length = len(self.pattern)
+
+        # Calculate frames per full cycle for sine generation
+        self.frames_per_cycle = refresh_rate / flicker_frequency
+
+        # Calculate achieved frequency
+        total_frames = sum(self.pattern) * 2
+        frames_per_cycle_actual = total_frames / self.pattern_length
+        self.achieved_frequency = self.refresh_rate / frames_per_cycle_actual
+        self.error = self.achieved_frequency - self.flicker_frequency
+
+    def _generate_pattern(self):
+        """Generate optimal alternating pattern using fraction reduction."""
+        fractional_part = self.ideal_frames_per_half - self.frames_low
+        frac = Fraction(fractional_part).limit_denominator(1000)
+
+        pattern_length = frac.denominator
+        num_high = frac.numerator
+
+        # Create evenly distributed pattern
+        pattern = []
+        for i in range(pattern_length):
+            if (i * num_high) % pattern_length < num_high:
+                pattern.append(self.frames_high)
+            else:
+                pattern.append(self.frames_low)
+
+        return pattern
+
+    def _get_sine_value(self, frame_num):
+        """
+        Calculate sine wave value for current frame.
+
+        Returns value from -1 (full MAGENTA) to +1 (full GREEN)
+        with 0 being mid-gray.
+        """
+        # Calculate position within full cycle
+        cycle_position = (frame_num % self.frames_per_cycle) / self.frames_per_cycle
+
+        # Generate sine wave
+        sine_value = np.sin(2 * np.pi * cycle_position)
+
+        return sine_value
+
+    def _blend_colors(self, color_a, color_b, sine_value):
+        """
+        Blend two colors based on sine value.
+
+        Args:
+            color_a: First color (e.g., GREEN) - corresponds to sine = +1
+            color_b: Second color (e.g., MAGENTA) - corresponds to sine = -1
+            sine_value: Value from -1 to +1
+
+        Returns:
+            Blended color
+        """
+        # Convert sine value (-1 to +1) to blend factor (0 to 1)
+        blend_factor = (sine_value + 1) / 2
+
+        # Linear interpolation
+        blended = [
+            color_b[i] * (1 - blend_factor) + color_a[i] * blend_factor
+            for i in range(3)
+        ]
+
+        return blended
+
+    def get_color_square(self, frame_num, color_a, color_b):
+        """
+        Square-wave flicker (original method).
+        Abrupt switching between two colors.
+        """
+        # Calculate position within pattern cycle
+        pattern_cycle_frames = sum(self.pattern) * 2
+        pos_in_cycle = frame_num % pattern_cycle_frames
+
+        # Find which half-cycle we're in
+        cumulative = 0
+        for half_idx in range(self.pattern_length * 2):
+            pattern_idx = half_idx % self.pattern_length
+            frames_this_half = self.pattern[pattern_idx]
+
+            if pos_in_cycle < cumulative + frames_this_half:
+                return color_a if half_idx % 2 == 0 else color_b
+
+            cumulative += frames_this_half
+
+        return color_a
+
+    def get_color_sine(self, frame_num, color_a, color_b):
+        """
+        Sine-wave flicker (new method).
+        Smooth gradual transitions between colors.
+        """
+        sine_value = self._get_sine_value(frame_num)
+        return self._blend_colors(color_a, color_b, sine_value)
+
+    def get_color(self, frame_num, color_a, color_b):
+        """
+        Get color for current frame based on selected mode.
+
+        Args:
+            frame_num: Current frame number
+            color_a: First color (GREEN)
+            color_b: Second color (MAGENTA)
+
+        Returns:
+            Color (list of 3 RGB values)
+        """
+        if self.mode == 'SINE':
+            return self.get_color_sine(frame_num, color_a, color_b)
+        else:
+            return self.get_color_square(frame_num, color_a, color_b)
+
+    def print_info(self):
+        """Print diagnostic information."""
+        print(f"  Target: {self.flicker_frequency} Hz")
+        print(f"  Mode: {self.mode}-wave")
+        print(f"  Ideal frames/half-cycle: {self.ideal_frames_per_half:.4f}")
+
+        if self.is_integer:
+            print(f"  Pattern type: EXACT INTEGER")
+            print(f"  Pattern: {self.frames_low} frames per half-cycle")
+        else:
+            print(f"  Pattern type: ADAPTIVE")
+            print(f"  Pattern: {self.pattern} (length={self.pattern_length})")
+
+        print(f"  Achieved: {self.achieved_frequency:.6f} Hz")
+        print(f"  Error: {self.error:.6f} Hz ({abs(self.error/self.flicker_frequency)*100:.4f}%)")
+
+# ==================== VALIDATION & SETUP ====================
+print(f"\n{'='*70}")
+print(f"ADAPTIVE FRAME-BASED {FLICKER_MODE}-WAVE FLICKER (OPTIMIZED)")
+print(f"{'='*70}")
+print(f"Monitor refresh rate: {REFRESH_RATE} Hz")
+print(f"Frame budget: {1000/REFRESH_RATE:.3f} ms")
+
+# Create adaptive patterns
+if ENABLE_NINE_OCLOCK_FLICKER:
+    print(f"\n9 o'clock Gabor:")
+    pattern_9 = AdaptiveFlickerPattern(REFRESH_RATE, NINE_OCLOCK_FLICKER_FREQUENCY, FLICKER_MODE)
+    pattern_9.print_info()
+else:
+    pattern_9 = None
+    print(f"\n9 o'clock Gabor: DISABLED")
+
+if ENABLE_THREE_OCLOCK_FLICKER:
+    print(f"\n3 o'clock Gabor:")
+    pattern_3 = AdaptiveFlickerPattern(REFRESH_RATE, THREE_OCLOCK_FLICKER_FREQUENCY, FLICKER_MODE)
+    pattern_3.print_info()
+else:
+    pattern_3 = None
+    print(f"\n3 o'clock Gabor: DISABLED")
+
+print(f"{'='*70}\n")
+
+# ================== GABOR PARAMETERS ========================
+GABOR_SIZE = 500      # NOTE: this is interpreted in line 384 as Diameter, not width/height because here we ElementArrayStim and it expects diameter.use 
+CIRCLE_RADIUS = 500
+GABOR_SF = 0.05 #! 0.05 by default     NOTE: 0.5 look good although we have frame drops, show Docky 0.05 for math to be correct
+GABOR_CONTRAST = 0.7
+GABOR_OPACITY = 0.7
+GABOR_PHASE = 0.5
+
+GABOR_SMOOTHNESS_DEFAULT = 0.05  # 0.05 by default
+GABOR_SMOOTHNESS_9_OCLOCK = 0.05 # 0.05 by default
+GABOR_SMOOTHNESS_3_OCLOCK = 0.15 # 0.05 by default
+
+ORIENTATION_DEFAULT = 0
+ORIENTATION_9_OCLOCK = -20
+ORIENTATION_3_OCLOCK = -20
+
+# ================== COLOR CONFIGURATION ========================
+# You can choose any of these color pairs:
+
+# Option 1: Chromatic opponent colors (GREEN/MAGENTA) - CURRENT
+GRAY_COLOR = [0.5, 0.5, 0.5] # Mid-gray for static Gabors (non-flickering)
+
+# Flickering between GREEN vs MAGENTA by default
+#COLOR_A = [-1.0, 1.0, -1.0]  # GREEN
+#COLOR_B = [1.0, -1.0, 1.0]   # MAGENTA
+
+# Option 2: Luminance modulation (BLACK/WHITE) - UNCOMMENT TO USE
+# GRAY_COLOR = [0.0, 0.0, 0.0]
+#COLOR_A = [-1.0, -1.0, -1.0]  # BLACK
+#COLOR_B = [1.0, 1.0, 1.0]     # WHITE
+
+# Option 3: Red/Cyan opponent colors - UNCOMMENT TO USE
+# GRAY_COLOR = [0.5, 0.5, 0.5]
+# COLOR_A = [1.0, -1.0, -1.0]   # RED
+# COLOR_B = [-1.0, 1.0, 1.0]    # CYAN
+
+# Option 4: Blue/Yellow opponent colors - UNCOMMENT TO USE
+# GRAY_COLOR = [0.5, 0.5, 0.5]
+COLOR_A = [-1.0, -1.0, 1.0]   # BLUE
+COLOR_B = [1.0, 1.0, -1.0]    # YELLOW
+
+ENABLE_LUMINANCE_SCALING = True
+LUMINANCE_MULTIPLIER = 0.7
+
+ENABLE_SATURATION_CONTROL = True
+SATURATION_LEVEL = 0.7
+
+TRIAL_DURATION = None
+
+# ==================== COLOR PROCESSING ====================
+def desaturate_color(color, saturation, gray_value=0.0):
+    return [gray_value + (c - gray_value) * saturation for c in color]
+
+if ENABLE_LUMINANCE_SCALING:
+    COLOR_A_LUM = [c * LUMINANCE_MULTIPLIER for c in COLOR_A]
+    COLOR_B_LUM = [c * LUMINANCE_MULTIPLIER for c in COLOR_B]
+else:
+    COLOR_A_LUM = COLOR_A
+    COLOR_B_LUM = COLOR_B
+
+if ENABLE_SATURATION_CONTROL:
+    COLOR_A_FINAL = desaturate_color(COLOR_A_LUM, SATURATION_LEVEL, BACKGROUND_COLOR[0])
+    COLOR_B_FINAL = desaturate_color(COLOR_B_LUM, SATURATION_LEVEL, BACKGROUND_COLOR[0])
+else:
+    COLOR_A_FINAL = COLOR_A_LUM
+    COLOR_B_FINAL = COLOR_B_LUM
+
+# Print color configuration
+print(f"{'='*70}")
+print(f"COLOR CONFIGURATION")
+print(f"{'='*70}")
+print(f"Color A: {COLOR_A}")
+print(f"Color B: {COLOR_B}")
+print(f"Average: {[(COLOR_A[i] + COLOR_B[i])/2 for i in range(3)]}")
+print(f"{'='*70}\n")
+
+# ==================== HELPER FUNCTIONS ====================
+def get_clock_position(hour, radius):
+    angle = (hour / 12.0) * 2 * np.pi - np.pi / 2
+    x = radius * np.cos(angle)
+    y = radius * np.sin(angle)
+    return [x, y]
+
+def create_custom_mask(size, sigma):      # NOTE: this function is NOT used in this scripts to save time for the loop/buffer
+    x = np.linspace(-1, 1, size)          # NOTE: this script is oriented in making it to the frame budget sstrictly as eliminating frames is more important
+    y = np.linspace(-1, 1, size)
+    X, Y = np.meshgrid(x, y)
+    distance = np.sqrt(X**2 + Y**2)
+    mask = np.exp(-(distance**2) / (2 * sigma**2))
+    mask = 2 * mask - 1
+    return mask
+
+# ==================== PSYCHOPY SETUP ====================
+print("Initializing PsychoPy window...")
+
+win = visual.Window(
+    size=[WINDOW_WIDTH, WINDOW_HEIGHT],
+    color=BACKGROUND_COLOR,
+    units='pix',
+    fullscr=True, # set to TRUE for fullscreen
+    monitor='testMonitor',
+    waitBlanking=True # True by default
+)
+
+fixation = visual.ShapeStim(
+    win,
+    vertices=((0, -10), (0, 10), (0, 0), (-10, 0), (10, 0)),
+    lineWidth=2,
+    lineColor='white',
+    closeShape=False
+)
+
+# ==================== CREATE GABOR STIMULI (OPTIMIZED VERSION) ====================
+print("Creating optimized Gabor array...")
+
+# Convert clock positions to numpy array
+clock_positions_array = np.array([12, 1.5, 3, 4.5, 6, 7.5, 9, 10.5]) # NOTE: by addind all 8 Gabors i have 0 frame drops
+n_gabors = len(clock_positions_array)
+
+# Calculate XY positions
+positions_xy = np.array([get_clock_position(hour, CIRCLE_RADIUS) 
+                         for hour in clock_positions_array])
+
+# Prepare orientations for each gabor
+orientations_list = []
+for hour in clock_positions_array:
+    if hour == 9:
+        orientations_list.append(ORIENTATION_9_OCLOCK)
+    elif hour == 3:
+        orientations_list.append(ORIENTATION_3_OCLOCK)
+    else:
+        orientations_list.append(ORIENTATION_DEFAULT)
+
+# Create single ElementArrayStim for ALL gabors
+gabors = visual.ElementArrayStim(      # NOTE: by using the in-built mask, creating gabors takes approx. 200KS instead of 32MB with the custom masking
+    win,
+    nElements=n_gabors,
+    sizes=GABOR_SIZE,    # use sizes=(GABOR_SIZE, GABOR_SIZE) here, to set width and height in line 248
+    xys=positions_xy,
+    sfs=GABOR_SF,
+    oris=orientations_list,
+    contrs=GABOR_CONTRAST,
+    opacities=GABOR_OPACITY,
+    phases=GABOR_PHASE,
+    elementMask= "gauss",   # NOTE: use this mask instead the custom mask from the HELPER FUNCTIONS, as it is pre-computed and PSYCHOPY keeps it memory, eliminating th need to upload customized mask.  SOFT EDGES: "raisedCos", "circle".   
+    elementTex=None,
+    units='pix'
+)
+
+# ==================== PRE-COMPUTE ALL COLORS (CRITICAL) ====================
+print(f"\n{'='*70}")
+print(f"PRE-COMPUTING COLORS FOR OPTIMAL PERFORMANCE")
+print(f"{'='*70}")
+#! this determines the length as when frames finish up the program stops on its own
+max_precompute_frames = 10000  #! ~21 seconds at 480Hz    360Hz = 27.78sec     240Hz = 41.67sec
+
+# Pre-allocate: shape = (frames, gabors, RGB)
+precomputed_colors_all = np.zeros((max_precompute_frames, n_gabors, 3))
+
+# Pre-compute for each gabor
+for idx, hour in enumerate(clock_positions_array):
+    if hour == 9 and ENABLE_NINE_OCLOCK_FLICKER:
+        print(f"Pre-computing for 9 o'clock (index {idx})...", end='')
+        for f in range(max_precompute_frames):
+            color = pattern_9.get_color(f, COLOR_A_FINAL, COLOR_B_FINAL)
+            precomputed_colors_all[f, idx, :] = color
+        print(f" ✓")
+    elif hour == 3 and ENABLE_THREE_OCLOCK_FLICKER:
+        print(f"Pre-computing for 3 o'clock (index {idx})...", end='')
+        for f in range(max_precompute_frames):
+            color = pattern_3.get_color(f, COLOR_A_FINAL, COLOR_B_FINAL)
+            precomputed_colors_all[f, idx, :] = color
+        print(f" ✓")
+    else:
+        # Static gray
+        precomputed_colors_all[:, idx, :] = GRAY_COLOR
+
+print(f"Pre-computation complete!")
+print(f"{'='*70}\n")
+
+# ==================== TRIAL SETUP ====================
+print("\n" + "="*70)
+print(f"ULTRA-OPTIMIZED {FLICKER_MODE}-WAVE FLICKER")
+print("="*70)
+print(f"Press SPACEBAR to end | Target: <2ms per frame")
+print("="*70 + "\n")
+
+trial_clock = core.Clock()
+frame_num = 0
+trial_ended = False
+
+# Pre-allocate timing arrays (no .append!)
+max_trial_frames = max_precompute_frames
+frame_times = np.zeros(max_trial_frames)
+frame_durations = np.zeros(max_trial_frames)
+slow_frames = []
+last_frame_time = None
+
+# Faster keyboard
+from psychopy.hardware import keyboard
+kb = keyboard.Keyboard()
+
+#! ==================== ULTRA-OPTIMIZED MAIN LOOP ====================
+# TARGET: 1.7ms per frame (0.36ms safety margin at 480Hz)
+
+while not trial_ended and frame_num < max_trial_frames:
+    # Keyboard check (every 10 frames = ~0.05ms amortized)
+    if frame_num % 10 == 0:
+        keys = kb.getKeys(['space'])
+        if keys:
+            print(f"\nEnded at {trial_clock.getTime():.2f}s")
+            trial_ended = True
+            break
+    
+    # Duration check
+    if TRIAL_DURATION is not None and trial_clock.getTime() >= TRIAL_DURATION:
+        print(f"\nMax duration reached")
+        trial_ended = True
+        break
+    
+    # *** CRITICAL: Single vectorized color update (~0.02ms) ***
+    gabors.colors = precomputed_colors_all[frame_num % max_precompute_frames]
+    
+    # *** Only 2 draw calls (~0.4ms) ***
+    fixation.draw()
+    gabors.draw()  # All gabors in ONE OpenGL call
+    
+    # *** Flip (~1.2ms for GPU) ***
+    win.flip()
+    
+    # Timing measurement (~0.05ms)
+    frame_end = time.perf_counter()
+    frame_times[frame_num] = trial_clock.getTime()
+    
+    if last_frame_time is not None:
+        frame_duration = (frame_end - last_frame_time) * 1000
+        frame_durations[frame_num - 1] = frame_duration
+        
+        frame_budget = 1000 / REFRESH_RATE
+        if frame_duration > frame_budget * 1.1:
+            slow_frames.append((frame_num, frame_duration))
+            if len(slow_frames) <= 10:
+                print(f"⚠ Frame {frame_num}: {frame_duration:.3f}ms")
+    
+    last_frame_time = frame_end
+    frame_num += 1
+
+# Trim arrays
+frame_times = frame_times[:frame_num]
+frame_durations = frame_durations[:frame_num-1]
+
+# ==================== FRAME TIMING DIAGNOSTICS ====================
+print("\n" + "="*70)
+print("FRAME TIMING DIAGNOSTICS")
+print("="*70)
+
+if len(frame_durations) > 0:
+    mean_duration = np.mean(frame_durations)
+    median_duration = np.median(frame_durations)
+    max_duration = np.max(frame_durations)
+    min_duration = np.min(frame_durations)
+    std_duration = np.std(frame_durations)
+
+    frame_budget = 1000 / REFRESH_RATE
+    slow_count = len(slow_frames)
+    dropped_count = sum(1 for d in frame_durations if d > frame_budget * 1.5)
+
+    print(f"\n*** FRAME DURATION STATISTICS ***")
+    print(f"  Mean:   {mean_duration:.3f} ms")
+    print(f"  Median: {median_duration:.3f} ms")
+    print(f"  Max:    {max_duration:.3f} ms")
+    print(f"  Min:    {min_duration:.3f} ms")
+    print(f"  Std:    {std_duration:.3f} ms")
+
+    print(f"\n*** FRAME BUDGET ANALYSIS ***")
+    print(f"  Target budget: {frame_budget:.3f} ms ({REFRESH_RATE} Hz)")
+    print(f"  Mean vs budget: {mean_duration - frame_budget:+.3f} ms")
+    print(f"  Slow frames (>10% over): {slow_count} ({slow_count/len(frame_durations)*100:.2f}%)")
+    print(f"  Dropped frames (>50% over): {dropped_count} ({dropped_count/len(frame_durations)*100:.2f}%)")
+
+    # Calculate actual refresh rate
+    actual_fps = 1000 / mean_duration
+    print(f"\n*** ACTUAL REFRESH RATE ***")
+    print(f"  Target: {REFRESH_RATE} Hz")
+    print(f"  Actual: {actual_fps:.2f} Hz")
+    print(f"  Match: {'✓ YES' if abs(actual_fps - REFRESH_RATE) < REFRESH_RATE * 0.05 else '✗ NO'}")
+
+    # Performance assessment
+    print(f"\n*** PERFORMANCE ASSESSMENT ***")
+    if mean_duration < frame_budget * 0.95 and slow_count < len(frame_durations) * 0.01:
+        print(f"  ✓ EXCELLENT: Comfortable margin, < 1% slow frames")
+    elif mean_duration < frame_budget and slow_count < len(frame_durations) * 0.05:
+        print(f"  ✓ GOOD: Within budget, < 5% slow frames")
+    elif mean_duration < frame_budget * 1.05:
+        print(f"  △ ACCEPTABLE: Close to budget, may have occasional drops")
+    else:
+        print(f"  ✗ POOR: Over budget, frequent dropped frames")
+        print(f"  → Try: Close background apps, reduce mask size, use SQUARE mode")
+
+    # Detailed slow frame list (if not too many)
+    if len(slow_frames) > 0 and len(slow_frames) <= 20:
+        print(f"\n*** SLOW FRAMES DETAIL ***")
+        for frame_id, duration in slow_frames[:20]:
+            print(f"  Frame {frame_id}: {duration:.3f} ms")
+        if len(slow_frames) > 20:
+            print(f"  ... and {len(slow_frames) - 20} more")
+
+print(f"\n{'='*70}\n")
+
+win.close()
+core.quit()
