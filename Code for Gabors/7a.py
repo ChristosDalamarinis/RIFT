@@ -26,14 +26,14 @@ WINDOW_HEIGHT = 900
 BACKGROUND_COLOR = [0.0, 0.0, 0.0] # Mid-gray
 REFRESH_RATE = 480  # Hz - Supports: 60, 120, 240, 360, 480
 
-# ================== FLICKER CONFIGURATION ========================
+#! ================== FLICKER CONFIGURATION ========================
 NINE_OCLOCK_FLICKER_FREQUENCY = 64  # Hz - Now supports non-integer!
 ENABLE_NINE_OCLOCK_FLICKER = False
 
 THREE_OCLOCK_FLICKER_FREQUENCY = 60 # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True
 
-# ==================== ADAPTIVE FLICKER CLASS ====================
+#! ==================== ADAPTIVE FLICKER CLASS ====================
 class AdaptiveFlickerPattern:
     """
     Manages adaptive frame patterns for any flicker frequency.
