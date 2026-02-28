@@ -38,7 +38,7 @@ ENABLE_NINE_OCLOCK_FLICKER = True
 THREE_OCLOCK_FLICKER_FREQUENCY = 1  # Hz
 ENABLE_THREE_OCLOCK_FLICKER = True
 
-# ================== FLICKER MODE CONFIGURATION ========================
+#! ================== FLICKER MODE CONFIGURATION ========================
 # Choose flicker mode: 'SQUARE' or 'SINE'
 FLICKER_MODE = 'SQUARE'  # Options: 'SQUARE', 'SINE'                       NOTE: use square if 120hz monitor and 60hz flicker is used
 
@@ -53,7 +53,7 @@ else:
     print("Benefits: Stronger SSVEP response, standard in literature")
 print(f"{'='*70}\n")
 
-# ==================== ADAPTIVE FLICKER CLASS WITH SINE ====================
+#! ==================== ADAPTIVE FLICKER CLASS WITH SINE ====================
 class AdaptiveFlickerPattern:
     """
     Manages adaptive frame patterns with optional sine-wave modulation.
