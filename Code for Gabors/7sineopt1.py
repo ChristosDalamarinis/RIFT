@@ -39,7 +39,7 @@ ENABLE_NINE_OCLOCK_FLICKER = True
 THREE_OCLOCK_FLICKER_FREQUENCY =  64 # Hz     # NOTE: 64 has some artifacts (halo), maybe look at the algorithm to fix it?
 ENABLE_THREE_OCLOCK_FLICKER = False
 
-# ================== FLICKER MODE CONFIGURATION ========================
+#! ================== FLICKER MODE CONFIGURATION ========================
 FLICKER_MODE = 'SINE'  # Options: 'SQUARE', 'SINE'         NOTE: SINE is a very good option when using 360Hz with 60Hz flicker
 
 print(f"\n{'='*70}")
